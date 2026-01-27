@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Kampagnen-Verwaltung</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <header>
+    <div class="header-inner">
+      <div class="brand">
+        <h1>Kampagnen-Verwaltung</h1>
+        <p>Orte, NSCs, Quests und Notizen zentral speichern.</p>
+      </div>
+      <nav>
+        <a href="index.html">Dashboard</a>
+        <a href="foundry.html">Foundry</a>
+        <a class="active" href="kampagne.html">Kampagne</a>
+        <a href="notizen.html">Notizen</a>
+        <a href="initiative.html">Initiative</a>
+        <a href="spieler.html">Spieler</a>
+        <a href="ai.html">DungeonMasterAI</a>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <div class="container">
+      <section class="section">
+        <h2>Neuen Eintrag anlegen</h2>
+        <div class="page-grid">
+          <div class="stack">
+            <div class="grid-two">
+              <div>
+                <label for="entry-type">Typ</label>
+                <select id="entry-type">
+                  <option>Ort</option>
+                  <option>NSC</option>
+                  <option>Quest</option>
+                  <option>Gegenstand</option>
+                  <option>Fraktion</option>
+                  <option>Notiz</option>
+                </select>
+              </div>
+              <div>
+                <label for="entry-title">Titel</label>
+                <input id="entry-title" placeholder="Name / Bezeichnung" />
+              </div>
+            </div>
+            <label for="entry-tags">Verlinkungen (kommagetrennt)</label>
+            <input id="entry-tags" placeholder="z.B. Schloss, Aria, Quest 3" />
+            <label for="entry-body">Beschreibung</label>
+            <textarea id="entry-body" placeholder="Kurze Beschreibung oder Kontext"></textarea>
+            <button id="add-entry">Eintrag speichern</button>
+          </div>
+          <div class="stack">
+            <h3>Tipps</h3>
+            <p class="small">Nutze Tags, um Orte, Personen und Quests schnell zu verbinden.</p>
+            <div class="stat">
+              <span class="small">Gesamt</span>
+              <strong data-stat="entries">0</strong>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="section">
+        <h2>Einträge</h2>
+        <div class="list" id="entry-list"></div>
+      </section>
+    </div>
+  </main>
+
+  <script src="app.js"></script>
+</body>
+</html>
