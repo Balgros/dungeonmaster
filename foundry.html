@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Foundry VTT</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <header>
+    <div class="header-inner">
+      <div class="brand">
+        <h1>Foundry VTT</h1>
+        <p>Lokales IFrame für deine Foundry-Instanz.</p>
+      </div>
+      <nav>
+        <a href="index.html">Dashboard</a>
+        <a class="active" href="foundry.html">Foundry</a>
+        <a href="kampagne.html">Kampagne</a>
+        <a href="notizen.html">Notizen</a>
+        <a href="initiative.html">Initiative</a>
+        <a href="spieler.html">Spieler</a>
+        <a href="ai.html">DungeonMasterAI</a>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <div class="container">
+      <section class="section">
+        <h2>Foundry verbinden</h2>
+        <div class="page-grid">
+          <div class="stack">
+            <label for="foundry-url">Foundry URL (lokal oder LAN)</label>
+            <input id="foundry-url" placeholder="http://localhost:30000" />
+            <button id="save-foundry">Foundry laden</button>
+            <p class="small">Hinweis: Foundry muss lokal laufen. Das Tool bindet die URL per IFrame ein.</p>
+          </div>
+          <div class="stack">
+            <h3>Schnellstart</h3>
+            <p class="small">Speichere die URL einmal, der Status bleibt im Browser erhalten.</p>
+            <div class="stat">
+              <span class="small">Beispiel-URL</span>
+              <strong>http://localhost:30000</strong>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="section iframe-card">
+        <h2>Live-Ansicht</h2>
+        <iframe id="foundry-frame" title="Foundry VTT" src="about:blank"></iframe>
+      </section>
+    </div>
+  </main>
+
+  <script src="app.js"></script>
+</body>
+</html>
