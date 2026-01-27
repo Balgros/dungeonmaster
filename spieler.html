@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Spielerübersicht</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <header>
+    <div class="header-inner">
+      <div class="brand">
+        <h1>Spielerübersicht</h1>
+        <p>HP, AC und Notizen für deine Gruppe.</p>
+      </div>
+      <nav>
+        <a href="index.html">Dashboard</a>
+        <a href="foundry.html">Foundry</a>
+        <a href="kampagne.html">Kampagne</a>
+        <a href="notizen.html">Notizen</a>
+        <a href="initiative.html">Initiative</a>
+        <a class="active" href="spieler.html">Spieler</a>
+        <a href="ai.html">DungeonMasterAI</a>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <div class="container">
+      <section class="section">
+        <h2>Spieler hinzufügen</h2>
+        <div class="page-grid">
+          <div class="stack">
+            <div class="grid-two">
+              <input id="player-name" placeholder="Spielername" />
+              <input id="player-class" placeholder="Klasse / Stufe" />
+            </div>
+            <div class="grid-two">
+              <input id="player-hp" placeholder="HP aktuell" />
+              <input id="player-ac" placeholder="AC" />
+            </div>
+            <label for="player-notes">Besonderheiten</label>
+            <input id="player-notes" placeholder="Zauber, Fokus, Ressourcen" />
+            <button id="add-player">Spieler hinzufügen</button>
+          </div>
+          <div class="stack">
+            <h3>Übersicht</h3>
+            <p class="small">Füge hier auch NPCs hinzu, die regelmäßig dabei sind.</p>
+            <div class="stat">
+              <span class="small">Aktive Spieler</span>
+              <strong data-stat="players">0</strong>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="section">
+        <h2>D&amp;D Beyond</h2>
+        <p class="small">Einfacher Überblick über Spielerwerte (manuell eingetragen).</p>
+        <table class="table" id="player-table">
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Klasse</th>
+              <th>HP</th>
+              <th>AC</th>
+              <th>Notizen</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </section>
+    </div>
+  </main>
+
+  <script src="app.js"></script>
+</body>
+</html>

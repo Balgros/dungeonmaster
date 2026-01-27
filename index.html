@@ -242,8 +242,21 @@
 </head>
 <body>
   <header>
-    <h1>DungeonMaster Tool (Offline)</h1>
-    <p>Lokales HTML-Dashboard für Foundry, Kampagnenverwaltung, Live-Notizen, Initiative und GPT-Unterstützung.</p>
+    <div class="header-inner">
+      <div class="brand">
+        <h1>DungeonMaster Tool</h1>
+        <p>Offline-Hub für Kampagnen, Initiative, Notizen und Foundry.</p>
+      </div>
+      <nav>
+        <a class="active" href="index.html">Dashboard</a>
+        <a href="foundry.html">Foundry</a>
+        <a href="kampagne.html">Kampagne</a>
+        <a href="notizen.html">Notizen</a>
+        <a href="initiative.html">Initiative</a>
+        <a href="spieler.html">Spieler</a>
+        <a href="ai.html">DungeonMasterAI</a>
+      </nav>
+    </div>
   </header>
 
   <main>
@@ -317,6 +330,7 @@
             <label for="monster-ac">RK / AC</label>
             <input id="monster-ac" placeholder="15" />
           </div>
+          <p class="small">Daten werden lokal im Browser gespeichert.</p>
         </div>
         <div class="grid-two">
           <div>
@@ -396,345 +410,7 @@
     </section>
   </main>
 
-  <script>
-    const state = {
-      entries: [],
-      monsters: [],
-      players: [],
-      foundryUrl: "",
-      gptUrl: "",
-      notes: "",
-    };
-
-    const storageKey = "dungeonmaster-tool";
-
-    const elements = {
-      entryList: document.getElementById("entry-list"),
-      entryType: document.getElementById("entry-type"),
-      entryTitle: document.getElementById("entry-title"),
-      entryTags: document.getElementById("entry-tags"),
-      entryBody: document.getElementById("entry-body"),
-      monsterTable: document.querySelector("#monster-table tbody"),
-      monsterName: document.getElementById("monster-name"),
-      monsterAc: document.getElementById("monster-ac"),
-      monsterHp: document.getElementById("monster-hp"),
-      monsterHpMax: document.getElementById("monster-hp-max"),
-      monsterInit: document.getElementById("monster-init"),
-      monsterNotes: document.getElementById("monster-notes"),
-      playerTable: document.querySelector("#player-table tbody"),
-      playerName: document.getElementById("player-name"),
-      playerClass: document.getElementById("player-class"),
-      playerHp: document.getElementById("player-hp"),
-      playerAc: document.getElementById("player-ac"),
-      playerNotes: document.getElementById("player-notes"),
-      foundryUrl: document.getElementById("foundry-url"),
-      foundryFrame: document.getElementById("foundry-frame"),
-      gptUrl: document.getElementById("gpt-url"),
-      gptFrame: document.getElementById("gpt-frame"),
-      liveNotes: document.getElementById("live-notes"),
-    };
-
-    const saveState = () => {
-      state.notes = elements.liveNotes.innerHTML;
-      localStorage.setItem(storageKey, JSON.stringify(state));
-    };
-
-    const loadState = () => {
-      const saved = localStorage.getItem(storageKey);
-      if (saved) {
-        try {
-          const parsed = JSON.parse(saved);
-          Object.assign(state, parsed);
-        } catch (error) {
-          console.warn("Konnte gespeicherten Zustand nicht laden", error);
-        }
-      }
-    };
-
-    const renderEntries = () => {
-      elements.entryList.innerHTML = "";
-      state.entries.forEach((entry, index) => {
-        const item = document.createElement("div");
-        item.className = "list-item";
-
-        const title = document.createElement("strong");
-        const type = document.createElement("span");
-        type.className = "pill";
-        type.textContent = entry.type;
-        title.append(entry.title + " ");
-        title.appendChild(type);
-
-        const tags = document.createElement("div");
-        tags.className = "small";
-        tags.textContent = entry.tags.join(", ") || "Keine Verlinkungen";
-
-        const body = document.createElement("div");
-        body.textContent = entry.body;
-
-        const removeButton = document.createElement("button");
-        removeButton.className = "secondary";
-        removeButton.dataset.remove = String(index);
-        removeButton.textContent = "Entfernen";
-
-        item.append(title, tags, body, removeButton);
-        elements.entryList.appendChild(item);
-      });
-    };
-
-    const renderMonsters = () => {
-      elements.monsterTable.innerHTML = "";
-      const sorted = [...state.monsters].sort((a, b) => Number(b.init) - Number(a.init));
-      sorted.forEach((monster) => {
-        const row = document.createElement("tr");
-        const nameCell = document.createElement("td");
-        nameCell.textContent = monster.name;
-
-        const initCell = document.createElement("td");
-        initCell.textContent = monster.init;
-
-        const hpCell = document.createElement("td");
-        const hpInput = document.createElement("input");
-        hpInput.dataset.hp = monster.id;
-        hpInput.value = monster.hp;
-        hpCell.appendChild(hpInput);
-
-        const hpMaxCell = document.createElement("td");
-        hpMaxCell.textContent = monster.hpMax;
-
-        const acCell = document.createElement("td");
-        acCell.textContent = monster.ac;
-
-        const notesCell = document.createElement("td");
-        notesCell.textContent = monster.notes;
-
-        const removeCell = document.createElement("td");
-        const removeButton = document.createElement("button");
-        removeButton.className = "danger";
-        removeButton.dataset.removeMonster = monster.id;
-        removeButton.textContent = "X";
-        removeCell.appendChild(removeButton);
-
-        row.append(nameCell, initCell, hpCell, hpMaxCell, acCell, notesCell, removeCell);
-        elements.monsterTable.appendChild(row);
-      });
-    };
-
-    const renderPlayers = () => {
-      elements.playerTable.innerHTML = "";
-      state.players.forEach((player) => {
-        const row = document.createElement("tr");
-        const nameCell = document.createElement("td");
-        nameCell.textContent = player.name;
-
-        const classCell = document.createElement("td");
-        classCell.textContent = player.class;
-
-        const hpCell = document.createElement("td");
-        hpCell.textContent = player.hp;
-
-        const acCell = document.createElement("td");
-        acCell.textContent = player.ac;
-
-        const notesCell = document.createElement("td");
-        notesCell.textContent = player.notes;
-
-        const removeCell = document.createElement("td");
-        const removeButton = document.createElement("button");
-        removeButton.className = "danger";
-        removeButton.dataset.removePlayer = player.id;
-        removeButton.textContent = "X";
-        removeCell.appendChild(removeButton);
-
-        row.append(nameCell, classCell, hpCell, acCell, notesCell, removeCell);
-        elements.playerTable.appendChild(row);
-      });
-    };
-
-    const applyFrames = () => {
-      elements.foundryFrame.src = state.foundryUrl || "about:blank";
-      elements.gptFrame.src = state.gptUrl || "about:blank";
-      elements.foundryUrl.value = state.foundryUrl;
-      elements.gptUrl.value = state.gptUrl;
-    };
-
-    const renderAll = () => {
-      renderEntries();
-      renderMonsters();
-      renderPlayers();
-      applyFrames();
-      elements.liveNotes.innerHTML = state.notes || "";
-    };
-
-    const addEntry = () => {
-      const title = elements.entryTitle.value.trim();
-      if (!title) return;
-      state.entries.unshift({
-        type: elements.entryType.value,
-        title,
-        tags: elements.entryTags.value
-          .split(",")
-          .map((tag) => tag.trim())
-          .filter(Boolean),
-        body: elements.entryBody.value.trim(),
-      });
-      elements.entryTitle.value = "";
-      elements.entryTags.value = "";
-      elements.entryBody.value = "";
-      renderEntries();
-      saveState();
-    };
-
-    const addMonster = () => {
-      const name = elements.monsterName.value.trim();
-      if (!name) return;
-      state.monsters.push({
-        id: crypto.randomUUID(),
-        name,
-        ac: elements.monsterAc.value.trim(),
-        hp: elements.monsterHp.value.trim(),
-        hpMax: elements.monsterHpMax.value.trim(),
-        init: elements.monsterInit.value.trim(),
-        notes: elements.monsterNotes.value.trim(),
-      });
-      elements.monsterName.value = "";
-      elements.monsterAc.value = "";
-      elements.monsterHp.value = "";
-      elements.monsterHpMax.value = "";
-      elements.monsterInit.value = "";
-      elements.monsterNotes.value = "";
-      renderMonsters();
-      saveState();
-    };
-
-    const addPlayer = () => {
-      const name = elements.playerName.value.trim();
-      if (!name) return;
-      state.players.push({
-        id: crypto.randomUUID(),
-        name,
-        class: elements.playerClass.value.trim(),
-        hp: elements.playerHp.value.trim(),
-        ac: elements.playerAc.value.trim(),
-        notes: elements.playerNotes.value.trim(),
-      });
-      elements.playerName.value = "";
-      elements.playerClass.value = "";
-      elements.playerHp.value = "";
-      elements.playerAc.value = "";
-      elements.playerNotes.value = "";
-      renderPlayers();
-      saveState();
-    };
-
-    document.getElementById("add-entry").addEventListener("click", addEntry);
-    document.getElementById("add-monster").addEventListener("click", addMonster);
-    document.getElementById("add-player").addEventListener("click", addPlayer);
-
-    document.getElementById("save-foundry").addEventListener("click", () => {
-      state.foundryUrl = elements.foundryUrl.value.trim();
-      applyFrames();
-      saveState();
-    });
-
-    document.getElementById("save-gpt").addEventListener("click", () => {
-      state.gptUrl = elements.gptUrl.value.trim();
-      applyFrames();
-      saveState();
-    });
-
-    elements.entryList.addEventListener("click", (event) => {
-      const button = event.target.closest("button[data-remove]");
-      if (!button) return;
-      const index = Number(button.dataset.remove);
-      state.entries.splice(index, 1);
-      renderEntries();
-      saveState();
-    });
-
-    elements.monsterTable.addEventListener("click", (event) => {
-      const button = event.target.closest("button[data-remove-monster]");
-      if (!button) return;
-      const id = button.dataset.removeMonster;
-      state.monsters = state.monsters.filter((monster) => monster.id !== id);
-      renderMonsters();
-      saveState();
-    });
-
-    elements.monsterTable.addEventListener("input", (event) => {
-      const input = event.target.closest("input[data-hp]");
-      if (!input) return;
-      const id = input.dataset.hp;
-      const monster = state.monsters.find((item) => item.id === id);
-      if (monster) {
-        monster.hp = input.value;
-        saveState();
-      }
-    });
-
-    elements.playerTable.addEventListener("click", (event) => {
-      const button = event.target.closest("button[data-remove-player]");
-      if (!button) return;
-      const id = button.dataset.removePlayer;
-      state.players = state.players.filter((player) => player.id !== id);
-      renderPlayers();
-      saveState();
-    });
-
-    let notesTimeout;
-    elements.liveNotes.addEventListener("input", () => {
-      clearTimeout(notesTimeout);
-      notesTimeout = setTimeout(saveState, 300);
-    });
-
-    document.getElementById("export-data").addEventListener("click", () => {
-      const payload = JSON.stringify(state, null, 2);
-      const blob = new Blob([payload], { type: "application/json" });
-      const url = URL.createObjectURL(blob);
-      const link = document.createElement("a");
-      link.href = url;
-      link.download = "dungeonmaster-data.json";
-      link.click();
-      URL.revokeObjectURL(url);
-    });
-
-    document.getElementById("import-data").addEventListener("click", () => {
-      const input = document.createElement("input");
-      input.type = "file";
-      input.accept = "application/json";
-      input.addEventListener("change", () => {
-        const file = input.files[0];
-        if (!file) return;
-        const reader = new FileReader();
-        reader.onload = () => {
-          try {
-            const parsed = JSON.parse(reader.result);
-            Object.assign(state, parsed);
-            renderAll();
-            saveState();
-          } catch (error) {
-            alert("Ungültige JSON-Datei.");
-          }
-        };
-        reader.readAsText(file);
-      });
-      input.click();
-    });
-
-    document.getElementById("reset-data").addEventListener("click", () => {
-      if (!confirm("Wirklich alles löschen?")) return;
-      state.entries = [];
-      state.monsters = [];
-      state.players = [];
-      state.notes = "";
-      state.foundryUrl = "";
-      state.gptUrl = "";
-      renderAll();
-      saveState();
-    });
-
-    loadState();
-    renderAll();
-  </script>
+  <script src="app.js"></script>
 </body>
 </html>
     section.foundry {

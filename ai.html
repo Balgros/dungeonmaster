@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>DungeonMasterAI</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <header>
+    <div class="header-inner">
+      <div class="brand">
+        <h1>DungeonMasterAI</h1>
+        <p>GPT-Chat in einem eingebetteten Fenster.</p>
+      </div>
+      <nav>
+        <a href="index.html">Dashboard</a>
+        <a href="foundry.html">Foundry</a>
+        <a href="kampagne.html">Kampagne</a>
+        <a href="notizen.html">Notizen</a>
+        <a href="initiative.html">Initiative</a>
+        <a href="spieler.html">Spieler</a>
+        <a class="active" href="ai.html">DungeonMasterAI</a>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <div class="container">
+      <section class="section">
+        <h2>GPT-Link speichern</h2>
+        <div class="page-grid">
+          <div class="stack">
+            <label for="gpt-url">GPT-Link / Chat-Embed</label>
+            <input id="gpt-url" placeholder="https://chat.openai.com/g/gpt-dungeonmaster" />
+            <button id="save-gpt">GPT Fenster öffnen</button>
+            <p class="small">Offline: Wenn kein Netzwerk verfügbar ist, nutze stattdessen gespeicherte Notizen.</p>
+          </div>
+          <div class="stack">
+            <h3>Hinweis</h3>
+            <p class="small">Der Link bleibt lokal im Browser gespeichert.</p>
+            <div class="stat">
+              <span class="small">Empfehlung</span>
+              <strong>Privater Modus</strong>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="section iframe-card">
+        <h2>Chatfenster</h2>
+        <iframe id="gpt-frame" title="DungeonMasterAI" src="about:blank"></iframe>
+      </section>
+    </div>
+  </main>
+
+  <script src="app.js"></script>
+</body>
+</html>
