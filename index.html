@@ -1,0 +1,715 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>DungeonMaster Tool (Offline)</title>
+  <style>
+    :root {
+      color-scheme: dark;
+      --bg: #101417;
+      --panel: #1a2026;
+      --panel-alt: #202831;
+      --text: #e6edf3;
+      --muted: #9fb0c2;
+      --accent: #5cc8ff;
+      --accent-2: #ffb86b;
+      --border: #2c3642;
+      --danger: #ff6b6b;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: "Inter", system-ui, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+    }
+
+    header {
+      padding: 20px 32px;
+      background: var(--panel);
+      border-bottom: 1px solid var(--border);
+    }
+
+    header h1 {
+      margin: 0 0 6px;
+      font-size: 22px;
+      letter-spacing: 0.5px;
+    }
+
+    header p {
+      margin: 0;
+      color: var(--muted);
+    }
+
+    main {
+      display: grid;
+      grid-template-columns: 320px 1fr 360px;
+      gap: 16px;
+      padding: 20px 32px 40px;
+    }
+
+    section {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      min-height: 0;
+    }
+
+    h2 {
+      font-size: 16px;
+      margin: 0;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: var(--accent);
+    }
+
+    h3 {
+      margin: 0 0 8px;
+      font-size: 14px;
+      color: var(--accent-2);
+    }
+
+    label {
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    input, select, textarea, button {
+      font: inherit;
+    }
+
+    input, select, textarea {
+      width: 100%;
+      padding: 8px 10px;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      background: var(--panel-alt);
+      color: var(--text);
+    }
+
+    textarea {
+      min-height: 80px;
+      resize: vertical;
+    }
+
+    button {
+      padding: 8px 12px;
+      border-radius: 8px;
+      border: none;
+      background: var(--accent);
+      color: #0b1116;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    button.secondary {
+      background: transparent;
+      color: var(--accent);
+      border: 1px solid var(--accent);
+    }
+
+    button.danger {
+      background: var(--danger);
+      color: #1c0a0a;
+    }
+
+    .stack {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .grid-two {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+
+    .list {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      max-height: 240px;
+      overflow-y: auto;
+      padding-right: 4px;
+    }
+
+    .list-item {
+      background: var(--panel-alt);
+      border-radius: 10px;
+      padding: 10px;
+      border: 1px solid transparent;
+    }
+
+    .list-item strong {
+      display: block;
+      margin-bottom: 4px;
+    }
+
+    .pill {
+      display: inline-flex;
+      padding: 2px 6px;
+      border-radius: 999px;
+      font-size: 11px;
+      border: 1px solid var(--border);
+      color: var(--muted);
+    }
+
+    .iframe-card iframe {
+      width: 100%;
+      height: 420px;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      background: #0b0f12;
+    }
+
+    .notes {
+      background: var(--panel-alt);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 12px;
+      min-height: 180px;
+      color: var(--text);
+    }
+
+    .notes[contenteditable="true"]:empty:before {
+      content: attr(data-placeholder);
+      color: var(--muted);
+    }
+
+    .table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    .table th, .table td {
+      padding: 6px 4px;
+      text-align: left;
+      font-size: 12px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .small {
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    .footer-actions {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    @media (max-width: 1200px) {
+      main {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>DungeonMaster Tool (Offline)</h1>
+    <p>Lokales HTML-Dashboard für Foundry, Kampagnenverwaltung, Live-Notizen, Initiative und GPT-Unterstützung.</p>
+  </header>
+
+  <main>
+    <section>
+      <h2>Foundry VTT</h2>
+      <div class="stack">
+        <label for="foundry-url">Foundry URL (lokal oder LAN)</label>
+        <input id="foundry-url" placeholder="http://localhost:30000" />
+        <button id="save-foundry">Foundry laden</button>
+      </div>
+      <div class="iframe-card">
+        <iframe id="foundry-frame" title="Foundry VTT" src="about:blank"></iframe>
+      </div>
+      <p class="small">Hinweis: Foundry muss lokal laufen. Das Tool bindet die URL per IFrame ein.</p>
+    </section>
+
+    <section>
+      <h2>Kampagnen-Verwaltung</h2>
+      <div class="stack">
+        <div class="grid-two">
+          <div>
+            <h3>Neuer Eintrag</h3>
+            <label for="entry-type">Typ</label>
+            <select id="entry-type">
+              <option>Ort</option>
+              <option>NSC</option>
+              <option>Quest</option>
+              <option>Gegenstand</option>
+              <option>Fraktion</option>
+              <option>Notiz</option>
+            </select>
+          </div>
+          <div>
+            <h3>&nbsp;</h3>
+            <label for="entry-title">Titel</label>
+            <input id="entry-title" placeholder="Name / Bezeichnung" />
+          </div>
+        </div>
+        <label for="entry-tags">Verlinkungen (kommagetrennt)</label>
+        <input id="entry-tags" placeholder="z.B. Schloss, Aria, Quest 3" />
+        <label for="entry-body">Beschreibung</label>
+        <textarea id="entry-body" placeholder="Kurze Beschreibung oder Kontext"></textarea>
+        <button id="add-entry">Eintrag speichern</button>
+      </div>
+      <h3>Einträge</h3>
+      <div class="list" id="entry-list"></div>
+    </section>
+
+    <section>
+      <h2>Live-Notizen</h2>
+      <div class="stack">
+        <label>Session-Notizen (auto-save)</label>
+        <div class="notes" id="live-notes" contenteditable="true" data-placeholder="Hier während der Session tippen ..."></div>
+        <div class="footer-actions">
+          <button class="secondary" id="export-data">Export JSON</button>
+          <button class="secondary" id="import-data">Import JSON</button>
+          <button class="danger" id="reset-data">Alles löschen</button>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <h2>Monster & Initiative</h2>
+      <div class="stack">
+        <div class="grid-two">
+          <div>
+            <label for="monster-name">Monster / NPC</label>
+            <input id="monster-name" placeholder="Goblin, Drache ..." />
+          </div>
+          <div>
+            <label for="monster-ac">RK / AC</label>
+            <input id="monster-ac" placeholder="15" />
+          </div>
+        </div>
+        <div class="grid-two">
+          <div>
+            <label for="monster-hp">HP (aktuell)</label>
+            <input id="monster-hp" placeholder="30" />
+          </div>
+          <div>
+            <label for="monster-hp-max">HP (max)</label>
+            <input id="monster-hp-max" placeholder="45" />
+          </div>
+        </div>
+        <label for="monster-init">Initiative</label>
+        <input id="monster-init" placeholder="12" />
+        <label for="monster-notes">Notizen / Fähigkeiten</label>
+        <textarea id="monster-notes" placeholder="Besondere Fähigkeiten, Resistenz ..."></textarea>
+        <button id="add-monster">Monster hinzufügen</button>
+      </div>
+      <h3>Initiative-Tracker</h3>
+      <table class="table" id="monster-table">
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>Init</th>
+            <th>HP</th>
+            <th>Max</th>
+            <th>AC</th>
+            <th>Notizen</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </section>
+
+    <section>
+      <h2>D&amp;D Beyond</h2>
+      <p class="small">Einfacher Überblick über Spielerwerte (manuell eingetragen).</p>
+      <div class="stack">
+        <div class="grid-two">
+          <input id="player-name" placeholder="Spielername" />
+          <input id="player-class" placeholder="Klasse / Stufe" />
+        </div>
+        <div class="grid-two">
+          <input id="player-hp" placeholder="HP aktuell" />
+          <input id="player-ac" placeholder="AC" />
+        </div>
+        <label for="player-notes">Besonderheiten</label>
+        <input id="player-notes" placeholder="Zauber, Fokus, Ressourcen" />
+        <button id="add-player">Spieler hinzufügen</button>
+      </div>
+      <table class="table" id="player-table">
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>Klasse</th>
+            <th>HP</th>
+            <th>AC</th>
+            <th>Notizen</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </section>
+
+    <section>
+      <h2>DungeonMasterAI</h2>
+      <div class="stack">
+        <label for="gpt-url">GPT-Link / Chat-Embed</label>
+        <input id="gpt-url" placeholder="https://chat.openai.com/g/gpt-dungeonmaster" />
+        <button id="save-gpt">GPT Fenster öffnen</button>
+      </div>
+      <div class="iframe-card">
+        <iframe id="gpt-frame" title="DungeonMasterAI" src="about:blank"></iframe>
+      </div>
+      <p class="small">Offline: Wenn kein Netzwerk verfügbar ist, nutze stattdessen gespeicherte Notizen.</p>
+    </section>
+  </main>
+
+  <script>
+    const state = {
+      entries: [],
+      monsters: [],
+      players: [],
+      foundryUrl: "",
+      gptUrl: "",
+      notes: "",
+    };
+
+    const storageKey = "dungeonmaster-tool";
+
+    const elements = {
+      entryList: document.getElementById("entry-list"),
+      entryType: document.getElementById("entry-type"),
+      entryTitle: document.getElementById("entry-title"),
+      entryTags: document.getElementById("entry-tags"),
+      entryBody: document.getElementById("entry-body"),
+      monsterTable: document.querySelector("#monster-table tbody"),
+      monsterName: document.getElementById("monster-name"),
+      monsterAc: document.getElementById("monster-ac"),
+      monsterHp: document.getElementById("monster-hp"),
+      monsterHpMax: document.getElementById("monster-hp-max"),
+      monsterInit: document.getElementById("monster-init"),
+      monsterNotes: document.getElementById("monster-notes"),
+      playerTable: document.querySelector("#player-table tbody"),
+      playerName: document.getElementById("player-name"),
+      playerClass: document.getElementById("player-class"),
+      playerHp: document.getElementById("player-hp"),
+      playerAc: document.getElementById("player-ac"),
+      playerNotes: document.getElementById("player-notes"),
+      foundryUrl: document.getElementById("foundry-url"),
+      foundryFrame: document.getElementById("foundry-frame"),
+      gptUrl: document.getElementById("gpt-url"),
+      gptFrame: document.getElementById("gpt-frame"),
+      liveNotes: document.getElementById("live-notes"),
+    };
+
+    const saveState = () => {
+      state.notes = elements.liveNotes.innerHTML;
+      localStorage.setItem(storageKey, JSON.stringify(state));
+    };
+
+    const loadState = () => {
+      const saved = localStorage.getItem(storageKey);
+      if (saved) {
+        try {
+          const parsed = JSON.parse(saved);
+          Object.assign(state, parsed);
+        } catch (error) {
+          console.warn("Konnte gespeicherten Zustand nicht laden", error);
+        }
+      }
+    };
+
+    const renderEntries = () => {
+      elements.entryList.innerHTML = "";
+      state.entries.forEach((entry, index) => {
+        const item = document.createElement("div");
+        item.className = "list-item";
+
+        const title = document.createElement("strong");
+        const type = document.createElement("span");
+        type.className = "pill";
+        type.textContent = entry.type;
+        title.append(entry.title + " ");
+        title.appendChild(type);
+
+        const tags = document.createElement("div");
+        tags.className = "small";
+        tags.textContent = entry.tags.join(", ") || "Keine Verlinkungen";
+
+        const body = document.createElement("div");
+        body.textContent = entry.body;
+
+        const removeButton = document.createElement("button");
+        removeButton.className = "secondary";
+        removeButton.dataset.remove = String(index);
+        removeButton.textContent = "Entfernen";
+
+        item.append(title, tags, body, removeButton);
+        elements.entryList.appendChild(item);
+      });
+    };
+
+    const renderMonsters = () => {
+      elements.monsterTable.innerHTML = "";
+      const sorted = [...state.monsters].sort((a, b) => Number(b.init) - Number(a.init));
+      sorted.forEach((monster) => {
+        const row = document.createElement("tr");
+        const nameCell = document.createElement("td");
+        nameCell.textContent = monster.name;
+
+        const initCell = document.createElement("td");
+        initCell.textContent = monster.init;
+
+        const hpCell = document.createElement("td");
+        const hpInput = document.createElement("input");
+        hpInput.dataset.hp = monster.id;
+        hpInput.value = monster.hp;
+        hpCell.appendChild(hpInput);
+
+        const hpMaxCell = document.createElement("td");
+        hpMaxCell.textContent = monster.hpMax;
+
+        const acCell = document.createElement("td");
+        acCell.textContent = monster.ac;
+
+        const notesCell = document.createElement("td");
+        notesCell.textContent = monster.notes;
+
+        const removeCell = document.createElement("td");
+        const removeButton = document.createElement("button");
+        removeButton.className = "danger";
+        removeButton.dataset.removeMonster = monster.id;
+        removeButton.textContent = "X";
+        removeCell.appendChild(removeButton);
+
+        row.append(nameCell, initCell, hpCell, hpMaxCell, acCell, notesCell, removeCell);
+        elements.monsterTable.appendChild(row);
+      });
+    };
+
+    const renderPlayers = () => {
+      elements.playerTable.innerHTML = "";
+      state.players.forEach((player) => {
+        const row = document.createElement("tr");
+        const nameCell = document.createElement("td");
+        nameCell.textContent = player.name;
+
+        const classCell = document.createElement("td");
+        classCell.textContent = player.class;
+
+        const hpCell = document.createElement("td");
+        hpCell.textContent = player.hp;
+
+        const acCell = document.createElement("td");
+        acCell.textContent = player.ac;
+
+        const notesCell = document.createElement("td");
+        notesCell.textContent = player.notes;
+
+        const removeCell = document.createElement("td");
+        const removeButton = document.createElement("button");
+        removeButton.className = "danger";
+        removeButton.dataset.removePlayer = player.id;
+        removeButton.textContent = "X";
+        removeCell.appendChild(removeButton);
+
+        row.append(nameCell, classCell, hpCell, acCell, notesCell, removeCell);
+        elements.playerTable.appendChild(row);
+      });
+    };
+
+    const applyFrames = () => {
+      elements.foundryFrame.src = state.foundryUrl || "about:blank";
+      elements.gptFrame.src = state.gptUrl || "about:blank";
+      elements.foundryUrl.value = state.foundryUrl;
+      elements.gptUrl.value = state.gptUrl;
+    };
+
+    const renderAll = () => {
+      renderEntries();
+      renderMonsters();
+      renderPlayers();
+      applyFrames();
+      elements.liveNotes.innerHTML = state.notes || "";
+    };
+
+    const addEntry = () => {
+      const title = elements.entryTitle.value.trim();
+      if (!title) return;
+      state.entries.unshift({
+        type: elements.entryType.value,
+        title,
+        tags: elements.entryTags.value
+          .split(",")
+          .map((tag) => tag.trim())
+          .filter(Boolean),
+        body: elements.entryBody.value.trim(),
+      });
+      elements.entryTitle.value = "";
+      elements.entryTags.value = "";
+      elements.entryBody.value = "";
+      renderEntries();
+      saveState();
+    };
+
+    const addMonster = () => {
+      const name = elements.monsterName.value.trim();
+      if (!name) return;
+      state.monsters.push({
+        id: crypto.randomUUID(),
+        name,
+        ac: elements.monsterAc.value.trim(),
+        hp: elements.monsterHp.value.trim(),
+        hpMax: elements.monsterHpMax.value.trim(),
+        init: elements.monsterInit.value.trim(),
+        notes: elements.monsterNotes.value.trim(),
+      });
+      elements.monsterName.value = "";
+      elements.monsterAc.value = "";
+      elements.monsterHp.value = "";
+      elements.monsterHpMax.value = "";
+      elements.monsterInit.value = "";
+      elements.monsterNotes.value = "";
+      renderMonsters();
+      saveState();
+    };
+
+    const addPlayer = () => {
+      const name = elements.playerName.value.trim();
+      if (!name) return;
+      state.players.push({
+        id: crypto.randomUUID(),
+        name,
+        class: elements.playerClass.value.trim(),
+        hp: elements.playerHp.value.trim(),
+        ac: elements.playerAc.value.trim(),
+        notes: elements.playerNotes.value.trim(),
+      });
+      elements.playerName.value = "";
+      elements.playerClass.value = "";
+      elements.playerHp.value = "";
+      elements.playerAc.value = "";
+      elements.playerNotes.value = "";
+      renderPlayers();
+      saveState();
+    };
+
+    document.getElementById("add-entry").addEventListener("click", addEntry);
+    document.getElementById("add-monster").addEventListener("click", addMonster);
+    document.getElementById("add-player").addEventListener("click", addPlayer);
+
+    document.getElementById("save-foundry").addEventListener("click", () => {
+      state.foundryUrl = elements.foundryUrl.value.trim();
+      applyFrames();
+      saveState();
+    });
+
+    document.getElementById("save-gpt").addEventListener("click", () => {
+      state.gptUrl = elements.gptUrl.value.trim();
+      applyFrames();
+      saveState();
+    });
+
+    elements.entryList.addEventListener("click", (event) => {
+      const button = event.target.closest("button[data-remove]");
+      if (!button) return;
+      const index = Number(button.dataset.remove);
+      state.entries.splice(index, 1);
+      renderEntries();
+      saveState();
+    });
+
+    elements.monsterTable.addEventListener("click", (event) => {
+      const button = event.target.closest("button[data-remove-monster]");
+      if (!button) return;
+      const id = button.dataset.removeMonster;
+      state.monsters = state.monsters.filter((monster) => monster.id !== id);
+      renderMonsters();
+      saveState();
+    });
+
+    elements.monsterTable.addEventListener("input", (event) => {
+      const input = event.target.closest("input[data-hp]");
+      if (!input) return;
+      const id = input.dataset.hp;
+      const monster = state.monsters.find((item) => item.id === id);
+      if (monster) {
+        monster.hp = input.value;
+        saveState();
+      }
+    });
+
+    elements.playerTable.addEventListener("click", (event) => {
+      const button = event.target.closest("button[data-remove-player]");
+      if (!button) return;
+      const id = button.dataset.removePlayer;
+      state.players = state.players.filter((player) => player.id !== id);
+      renderPlayers();
+      saveState();
+    });
+
+    let notesTimeout;
+    elements.liveNotes.addEventListener("input", () => {
+      clearTimeout(notesTimeout);
+      notesTimeout = setTimeout(saveState, 300);
+    });
+
+    document.getElementById("export-data").addEventListener("click", () => {
+      const payload = JSON.stringify(state, null, 2);
+      const blob = new Blob([payload], { type: "application/json" });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = "dungeonmaster-data.json";
+      link.click();
+      URL.revokeObjectURL(url);
+    });
+
+    document.getElementById("import-data").addEventListener("click", () => {
+      const input = document.createElement("input");
+      input.type = "file";
+      input.accept = "application/json";
+      input.addEventListener("change", () => {
+        const file = input.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = () => {
+          try {
+            const parsed = JSON.parse(reader.result);
+            Object.assign(state, parsed);
+            renderAll();
+            saveState();
+          } catch (error) {
+            alert("Ungültige JSON-Datei.");
+          }
+        };
+        reader.readAsText(file);
+      });
+      input.click();
+    });
+
+    document.getElementById("reset-data").addEventListener("click", () => {
+      if (!confirm("Wirklich alles löschen?")) return;
+      state.entries = [];
+      state.monsters = [];
+      state.players = [];
+      state.notes = "";
+      state.foundryUrl = "";
+      state.gptUrl = "";
+      renderAll();
+      saveState();
+    });
+
+    loadState();
+    renderAll();
+  </script>
+</body>
+</html>
