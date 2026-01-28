@@ -2,12 +2,14 @@ const state = {
   entries: [],
   monsters: [],
   players: [],
-  foundryUrl: "",
-  gptUrl: "",
   notes: "",
+  chatLog: "",
 };
 
-const storageKey = "dungeonmaster-tool";
+const fixedUrls = {
+  foundry: "https://dnd.tavacloud.com/join",
+  gpt: "https://chat.openai.com/g/gpt-dungeonmaster",
+};
 
 const getEl = (id) => document.getElementById(id);
 
@@ -30,33 +32,45 @@ const elements = {
   playerHp: getEl("player-hp"),
   playerAc: getEl("player-ac"),
   playerNotes: getEl("player-notes"),
-  foundryUrl: getEl("foundry-url"),
   foundryFrame: getEl("foundry-frame"),
-  gptUrl: getEl("gpt-url"),
   gptFrame: getEl("gpt-frame"),
   liveNotes: getEl("live-notes"),
+  chatLog: getEl("chat-log"),
   entryCount: document.querySelector("[data-stat='entries']"),
   monsterCount: document.querySelector("[data-stat='monsters']"),
   playerCount: document.querySelector("[data-stat='players']"),
 };
 
-const saveState = () => {
-  if (elements.liveNotes) {
-    state.notes = elements.liveNotes.innerHTML;
-  }
-  localStorage.setItem(storageKey, JSON.stringify(state));
+const downloadJson = (data, filename) => {
+  const payload = JSON.stringify(data, null, 2);
+  const blob = new Blob([payload], { type: "application/json" });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement("a");
+  link.href = url;
+  link.download = filename;
+  link.click();
+  URL.revokeObjectURL(url);
 };
 
-const loadState = () => {
-  const saved = localStorage.getItem(storageKey);
-  if (saved) {
-    try {
-      const parsed = JSON.parse(saved);
-      Object.assign(state, parsed);
-    } catch (error) {
-      console.warn("Konnte gespeicherten Zustand nicht laden", error);
-    }
-  }
+const loadJsonFile = (callback) => {
+  const input = document.createElement("input");
+  input.type = "file";
+  input.accept = "application/json";
+  input.addEventListener("change", () => {
+    const file = input.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = () => {
+      try {
+        const parsed = JSON.parse(reader.result);
+        callback(parsed);
+      } catch (error) {
+        alert("Ungültige JSON-Datei.");
+      }
+    };
+    reader.readAsText(file);
+  });
+  input.click();
 };
 
 const updateStats = () => {
@@ -178,16 +192,10 @@ const renderPlayers = () => {
 
 const applyFrames = () => {
   if (elements.foundryFrame) {
-    elements.foundryFrame.src = state.foundryUrl || "about:blank";
+    elements.foundryFrame.src = fixedUrls.foundry;
   }
   if (elements.gptFrame) {
-    elements.gptFrame.src = state.gptUrl || "about:blank";
-  }
-  if (elements.foundryUrl) {
-    elements.foundryUrl.value = state.foundryUrl;
-  }
-  if (elements.gptUrl) {
-    elements.gptUrl.value = state.gptUrl;
+    elements.gptFrame.src = fixedUrls.gpt;
   }
 };
 
@@ -197,7 +205,10 @@ const renderAll = () => {
   renderPlayers();
   applyFrames();
   if (elements.liveNotes) {
-    elements.liveNotes.innerHTML = state.notes || "";
+    elements.liveNotes.textContent = state.notes || "";
+  }
+  if (elements.chatLog) {
+    elements.chatLog.value = state.chatLog || "";
   }
   updateStats();
 };
@@ -219,7 +230,6 @@ const addEntry = () => {
   elements.entryTags.value = "";
   elements.entryBody.value = "";
   renderEntries();
-  saveState();
 };
 
 const addMonster = () => {
@@ -242,7 +252,6 @@ const addMonster = () => {
   elements.monsterInit.value = "";
   elements.monsterNotes.value = "";
   renderMonsters();
-  saveState();
 };
 
 const addPlayer = () => {
@@ -263,7 +272,6 @@ const addPlayer = () => {
   elements.playerAc.value = "";
   elements.playerNotes.value = "";
   renderPlayers();
-  saveState();
 };
 
 if (getEl("add-entry")) {
@@ -276,22 +284,6 @@ if (getEl("add-player")) {
   getEl("add-player").addEventListener("click", addPlayer);
 }
 
-if (getEl("save-foundry")) {
-  getEl("save-foundry").addEventListener("click", () => {
-    state.foundryUrl = elements.foundryUrl.value.trim();
-    applyFrames();
-    saveState();
-  });
-}
-
-if (getEl("save-gpt")) {
-  getEl("save-gpt").addEventListener("click", () => {
-    state.gptUrl = elements.gptUrl.value.trim();
-    applyFrames();
-    saveState();
-  });
-}
-
 if (elements.entryList) {
   elements.entryList.addEventListener("click", (event) => {
     const button = event.target.closest("button[data-remove]");
@@ -299,7 +291,6 @@ if (elements.entryList) {
     const index = Number(button.dataset.remove);
     state.entries.splice(index, 1);
     renderEntries();
-    saveState();
   });
 }
 
@@ -310,7 +301,6 @@ if (elements.monsterTable) {
     const id = button.dataset.removeMonster;
     state.monsters = state.monsters.filter((monster) => monster.id !== id);
     renderMonsters();
-    saveState();
   });
 
   elements.monsterTable.addEventListener("input", (event) => {
@@ -320,7 +310,6 @@ if (elements.monsterTable) {
     const monster = state.monsters.find((item) => item.id === id);
     if (monster) {
       monster.hp = input.value;
-      saveState();
     }
   });
 }
@@ -332,7 +321,6 @@ if (elements.playerTable) {
     const id = button.dataset.removePlayer;
     state.players = state.players.filter((player) => player.id !== id);
     renderPlayers();
-    saveState();
   });
 }
 
@@ -340,61 +328,91 @@ if (elements.liveNotes) {
   let notesTimeout;
   elements.liveNotes.addEventListener("input", () => {
     clearTimeout(notesTimeout);
-    notesTimeout = setTimeout(saveState, 300);
+    notesTimeout = setTimeout(() => {
+      state.notes = elements.liveNotes.textContent;
+    }, 300);
   });
 }
 
-if (getEl("export-data")) {
-  getEl("export-data").addEventListener("click", () => {
-    const payload = JSON.stringify(state, null, 2);
-    const blob = new Blob([payload], { type: "application/json" });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement("a");
-    link.href = url;
-    link.download = "dungeonmaster-data.json";
-    link.click();
-    URL.revokeObjectURL(url);
+if (elements.chatLog) {
+  let chatTimeout;
+  elements.chatLog.addEventListener("input", () => {
+    clearTimeout(chatTimeout);
+    chatTimeout = setTimeout(() => {
+      state.chatLog = elements.chatLog.value;
+    }, 300);
   });
 }
 
-if (getEl("import-data")) {
-  getEl("import-data").addEventListener("click", () => {
-    const input = document.createElement("input");
-    input.type = "file";
-    input.accept = "application/json";
-    input.addEventListener("change", () => {
-      const file = input.files[0];
-      if (!file) return;
-      const reader = new FileReader();
-      reader.onload = () => {
-        try {
-          const parsed = JSON.parse(reader.result);
-          Object.assign(state, parsed);
-          renderAll();
-          saveState();
-        } catch (error) {
-          alert("Ungültige JSON-Datei.");
-        }
-      };
-      reader.readAsText(file);
+if (getEl("export-notes")) {
+  getEl("export-notes").addEventListener("click", () => {
+    state.notes = elements.liveNotes ? elements.liveNotes.textContent : state.notes;
+    downloadJson({ notes: state.notes }, "dungeonmaster-notes.json");
+  });
+}
+
+if (getEl("import-notes")) {
+  getEl("import-notes").addEventListener("click", () => {
+    loadJsonFile((parsed) => {
+      state.notes = typeof parsed.notes === "string" ? parsed.notes : "";
+      renderAll();
     });
-    input.click();
   });
 }
 
-if (getEl("reset-data")) {
-  getEl("reset-data").addEventListener("click", () => {
-    if (!confirm("Wirklich alles löschen?")) return;
-    state.entries = [];
-    state.monsters = [];
-    state.players = [];
+if (getEl("export-players")) {
+  getEl("export-players").addEventListener("click", () => {
+    downloadJson({ players: state.players }, "dungeonmaster-players.json");
+  });
+}
+
+if (getEl("import-players")) {
+  getEl("import-players").addEventListener("click", () => {
+    loadJsonFile((parsed) => {
+      state.players = Array.isArray(parsed.players) ? parsed.players : [];
+      renderPlayers();
+    });
+  });
+}
+
+if (getEl("export-chatlog")) {
+  getEl("export-chatlog").addEventListener("click", () => {
+    state.chatLog = elements.chatLog ? elements.chatLog.value : state.chatLog;
+    downloadJson({ chatLog: state.chatLog }, "dungeonmaster-chatlog.json");
+  });
+}
+
+if (getEl("import-chatlog")) {
+  getEl("import-chatlog").addEventListener("click", () => {
+    loadJsonFile((parsed) => {
+      state.chatLog = typeof parsed.chatLog === "string" ? parsed.chatLog : "";
+      renderAll();
+    });
+  });
+}
+
+if (getEl("reset-notes")) {
+  getEl("reset-notes").addEventListener("click", () => {
+    if (!confirm("Wirklich alle Notizen löschen?")) return;
     state.notes = "";
-    state.foundryUrl = "";
-    state.gptUrl = "";
     renderAll();
-    saveState();
   });
 }
 
-loadState();
+if (getEl("reset-players")) {
+  getEl("reset-players").addEventListener("click", () => {
+    if (!confirm("Wirklich alle Spieler löschen?")) return;
+    state.players = [];
+    renderPlayers();
+  });
+}
+
+if (getEl("reset-chatlog")) {
+  getEl("reset-chatlog").addEventListener("click", () => {
+    if (!confirm("Wirklich den Chatlog löschen?")) return;
+    state.chatLog = "";
+    renderAll();
+  });
+}
+
 renderAll();
