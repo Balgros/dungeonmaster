@@ -28,28 +28,24 @@
   <main>
     <div class="container">
       <section class="section">
-        <h2>GPT-Link speichern</h2>
-        <div class="page-grid">
-          <div class="stack">
-            <label for="gpt-url">GPT-Link / Chat-Embed</label>
-            <input id="gpt-url" placeholder="https://chat.openai.com/g/gpt-dungeonmaster" />
-            <button id="save-gpt">GPT Fenster öffnen</button>
-            <p class="small">Offline: Wenn kein Netzwerk verfügbar ist, nutze stattdessen gespeicherte Notizen.</p>
-          </div>
-          <div class="stack">
-            <h3>Hinweis</h3>
-            <p class="small">Der Link bleibt lokal im Browser gespeichert.</p>
-            <div class="stat">
-              <span class="small">Empfehlung</span>
-              <strong>Privater Modus</strong>
-            </div>
-          </div>
-        </div>
+        <h2>DungeonMasterAI Chat</h2>
+        <p class="small">Fester Embed-Link: https://chat.openai.com/g/gpt-dungeonmaster</p>
       </section>
 
       <section class="section iframe-card">
         <h2>Chatfenster</h2>
-        <iframe id="gpt-frame" title="DungeonMasterAI" src="about:blank"></iframe>
+        <iframe id="gpt-frame" title="DungeonMasterAI" src="https://chat.openai.com/g/gpt-dungeonmaster"></iframe>
+      </section>
+
+      <section class="section">
+        <h2>Chatlog</h2>
+        <label for="chat-log">Notizen aus dem GPT-Chat</label>
+        <textarea id="chat-log" class="notes" rows="8" placeholder="Wichtige Antworten hier festhalten ..."></textarea>
+        <div class="footer-actions">
+          <button class="secondary" id="export-chatlog">Chatlog exportieren</button>
+          <button class="secondary" id="import-chatlog">Chatlog importieren</button>
+          <button class="danger" id="reset-chatlog">Chatlog löschen</button>
+        </div>
       </section>
     </div>
   </main>

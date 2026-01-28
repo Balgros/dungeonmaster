@@ -93,6 +93,23 @@ main {
   padding: 24px 32px 64px;
 }
 
+.dashboard-layout {
+  display: grid;
+  grid-template-columns: minmax(260px, 1fr) minmax(520px, 1.6fr) minmax(280px, 1fr);
+  gap: 20px;
+  align-items: start;
+}
+
+.dashboard-layout .iframe-card iframe {
+  height: 70vh;
+}
+
+.notes-panel,
+.foundry-panel,
+.players-panel {
+  min-height: 0;
+}
+
 .container {
   max-width: 1200px;
   margin: 0 auto;
@@ -355,6 +372,14 @@ button.danger {
 
   .page-grid {
     grid-template-columns: 1fr;
+  }
+
+  .dashboard-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .dashboard-layout .iframe-card iframe {
+    height: 420px;
   }
 }
 
